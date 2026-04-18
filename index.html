@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrackLab — E-commerce Sandbox</title>
+  <!-- GTM HEAD SNIPPET GOES HERE -->
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      background: #fff;
+      border-bottom: 1px solid #e5e5e5;
+      padding: 0.875rem 1.5rem;
+    }
+
+    .navbar-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .site-name {
+      font-weight: 700;
+      font-size: 1.125rem;
+      letter-spacing: -0.02em;
+    }
+
+    main {
+      flex: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      width: 100%;
+    }
+
+    .product-card {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 10px;
+      padding: 1.5rem;
+      max-width: 360px;
+    }
+
+    .product-image {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: linear-gradient(135deg, #e8e8e8 0%, #d4d4d4 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #737373;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    .product-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+    }
+
+    .product-price {
+      font-size: 1.125rem;
+      color: #404040;
+      margin: 0 0 1.25rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      font: inherit;
+      padding: 0.625rem 1rem;
+      border-radius: 6px;
+      border: 1px solid #d4d4d4;
+      background: #fff;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn:hover {
+      background: #fafafa;
+      border-color: #a3a3a3;
+    }
+
+    .btn-primary {
+      background: #171717;
+      color: #fff;
+      border-color: #171717;
+    }
+
+    .btn-primary:hover {
+      background: #404040;
+      border-color: #404040;
+    }
+
+    .event-log-wrap {
+      margin-top: auto;
+      border-top: 1px solid #e5e5e5;
+      background: #0d0d0d;
+    }
+
+    .event-log-header {
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #525252;
+      border-bottom: 1px solid #262626;
+    }
+
+    .event-log {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: #22c55e;
+      padding: 1rem;
+      min-height: 140px;
+      max-height: 220px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .event-log-empty {
+      color: #525252;
+    }
+  </style>
+</head>
+<body>
+  <!-- GTM BODY SNIPPET GOES HERE -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <span class="site-name">TrackLab</span>
+    </div>
+  </nav>
+
+  <main>
+    <article class="product-card">
+      <div class="product-image" role="img" aria-label="Product image placeholder">Image placeholder</div>
+      <h1 class="product-name">Wireless Headphones</h1>
+      <p class="product-price">$49.99 USD</p>
+      <div class="actions">
+        <button type="button" class="btn" id="btn-sign-in">Sign In</button>
+        <button type="button" class="btn" id="btn-add-to-cart">Add to Cart</button>
+        <button type="button" class="btn btn-primary" id="btn-purchase">Purchase</button>
+      </div>
+    </article>
+  </main>
+
+  <div class="event-log-wrap">
+    <div class="event-log-header">Event log</div>
+    <div class="event-log" id="event-log" aria-live="polite"><span class="event-log-empty">No events yet.</span></div>
+  </div>
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function generateEventId() {
+      var random = Math.floor(1000 + Math.random() * 9000);
+      return 'evt_' + Date.now() + '_' + random;
+    }
+
+    var logEl = document.getElementById('event-log');
+    var emptyShown = true;
+
+    function appendToLog(obj) {
+      if (emptyShown) {
+        logEl.textContent = '';
+        emptyShown = false;
+      }
+      var line = JSON.stringify(obj, null, 2);
+      logEl.appendChild(document.createTextNode(line + '\n\n'));
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function pushAndLog(payload) {
+      window.dataLayer.push(payload);
+      appendToLog(payload);
+    }
+
+    document.getElementById('btn-sign-in').addEventListener('click', function () {
+      pushAndLog({
+        event: 'sign_in',
+        event_id: generateEventId(),
+        user_email: 'test@example.com'
+      });
+    });
+
+    document.getElementById('btn-add-to-cart').addEventListener('click', function () {
+      pushAndLog({
+        event: 'add_to_cart',
+        event_id: generateEventId(),
+        product_id: 'PROD_001',
+        product_name: 'Wireless Headphones',
+        value: 49.99,
+        currency: 'USD'
+      });
+    });
+
+    document.getElementById('btn-purchase').addEventListener('click', function () {
+      pushAndLog({
+        event: 'purchase',
+        event_id: generateEventId(),
+        order_id: 'ORD_' + Date.now(),
+        product_id: 'PROD_001',
+        product_name: 'Wireless Headphones',
+        value: 49.99,
+        currency: 'USD'
+      });
+    });
+  </script>
+</body>
+</html>
