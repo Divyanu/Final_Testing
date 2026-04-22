@@ -14,11 +14,43 @@ export default async function handler(req, res) {
     const REDDIT_PIXEL_ID = process.env.REDDIT_PIXEL_ID;
     const REDDIT_ACCESS_TOKEN = process.env.REDDIT_ACCESS_TOKEN;
   
-    // TEMPORARY DEBUG — remove after fixing
-    return res.status(200).json({
-      pixel_id: REDDIT_PIXEL_ID,
-      token_length: REDDIT_ACCESS_TOKEN ? REDDIT_ACCESS_TOKEN.length : 0,
-      token_first10: REDDIT_ACCESS_TOKEN ? REDDIT_ACCESS_TOKEN.substring(0, 10) : 'EMPTY',
-      token_last5: REDDIT_ACCESS_TOKEN ? REDDIT_ACCESS_TOKEN.slice(-5) : 'EMPTY'
-    });
+    if (!REDDIT_PIXEL_ID || !REDDIT_ACCESS_TOKEN) {
+      return res.status(500).json({ error: 'Missing credentials' });
+    }
+  
+    const { event_type, event_id, value, currency, product_id, order_id, click_id } = req.body;
+  
+    const payload = {
+      test_mode: true,
+      events: [{
+        event_at: new Date().toISOString(),
+        event_type: { tracking_type: event_type },
+        event_metadata: {
+          item_count: 1,
+          value_decimal: value || 0,
+          currency: currency || 'USD',
+          conversion_id: event_id,
+          ...(order_id && { order_id }),
+          ...(product_id && { products: [{ id: product_id }] })
+        },
+        user: {
+          ...(click_id && { click_id })
+        }
+      }]
+    };
+  
+    const response = await fetch(
+      `https://ads-api.reddit.com/api/v2.0/conversions/events/${REDDIT_PIXEL_ID}?account_id=t2_2ckc6upnuy`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${REDDIT_ACCESS_TOKEN}`
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+  
+    const data = await response.json();
+    return res.status(200).json({ success: true, reddit_response: data });
   }
