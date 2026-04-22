@@ -1,6 +1,11 @@
 export default async function handler(req, res) {
-    // Add CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
+    const requestOrigin = req.headers.origin || '';
+
+    // Add CORS headers (allow only configured origin when provided)
+    if (ALLOWED_ORIGIN && requestOrigin === ALLOWED_ORIGIN) {
+      res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
@@ -27,6 +32,10 @@ export default async function handler(req, res) {
   
       const REDDIT_PIXEL_ID = process.env.REDDIT_PIXEL_ID;
       const REDDIT_ACCESS_TOKEN = process.env.REDDIT_ACCESS_TOKEN;
+
+      if (!REDDIT_PIXEL_ID || !REDDIT_ACCESS_TOKEN) {
+        return res.status(500).json({ error: 'Server not configured for Reddit CAPI' });
+      }
   
       const payload = {
         test_mode: true,
@@ -66,12 +75,17 @@ export default async function handler(req, res) {
       );
   
       const data = await response.json();
-      console.log('Reddit CAPI response:', JSON.stringify(data));
-  
-      return res.status(200).json({ success: true, reddit_response: data });
+
+      if (!response.ok) {
+        // Log status only; avoid leaking raw provider payloads or credentials.
+        console.error('Reddit CAPI failed with status:', response.status);
+        return res.status(502).json({ error: 'Upstream conversion API request failed' });
+      }
+
+      return res.status(200).json({ success: true });
   
     } catch (error) {
-      console.error('CAPI error:', error);
-      return res.status(500).json({ error: error.message });
+      console.error('CAPI handler error');
+      return res.status(500).json({ error: 'Internal server error' });
     }
   }
