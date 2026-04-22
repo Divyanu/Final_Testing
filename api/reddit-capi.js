@@ -22,6 +22,7 @@ export default async function handler(req, res) {
   
     const payload = {
       test_mode: true,
+      test_id: 't2_w3l8ou9m3',
       events: [{
         event_at: new Date().toISOString(),
         event_type: { tracking_type: event_type },
