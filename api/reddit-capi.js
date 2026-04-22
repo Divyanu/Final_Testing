@@ -21,8 +21,8 @@ export default async function handler(req, res) {
     const { event_type, event_id, value, currency, product_id, order_id, click_id } = req.body;
   
     const payload = {
-      test_mode: true,
-      test_id: 't2_w3l8ou9m3',
+        test_mode: true,
+        ...(test_id && { test_id }),
       events: [{
         event_at: new Date().toISOString(),
         event_type: { tracking_type: event_type },
