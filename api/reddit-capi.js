@@ -22,12 +22,11 @@ export default async function handler(req, res) {
   
     const payload = {
         test_mode: false,
-        ...(test_id && { test_id }),
       events: [{
         event_at: new Date().toISOString(),
         event_type: { tracking_type: event_type },
         event_metadata: {
-          item_count: 1,
+          ...(event_type !== 'SignUp' && { item_count: 1 }),
           value_decimal: value || 0,
           currency: currency || 'USD',
           conversion_id: event_id,
@@ -53,5 +52,8 @@ export default async function handler(req, res) {
     );
   
     const data = await response.json();
+    if (!response.ok) {
+      return res.status(502).json({ success: false, reddit_response: data });
+    }
     return res.status(200).json({ success: true, reddit_response: data });
   }
