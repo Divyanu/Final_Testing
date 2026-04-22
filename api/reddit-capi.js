@@ -82,7 +82,7 @@ export default async function handler(req, res) {
         return res.status(502).json({ error: 'Upstream conversion API request failed' });
       }
 
-      return res.status(200).json({ success: true });
+      return res.status(200).json({ success: true, reddit_response: data, pixel_used: REDDIT_PIXEL_ID });
   
     } catch (error) {
       console.error('CAPI handler error');
