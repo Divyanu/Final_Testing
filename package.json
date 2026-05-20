@@ -1,0 +1,10 @@
+{
+  "name": "final-testing",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Minimal static sandbox for ad-tech tracking tests.",
+  "scripts": {
+    "ui": "node serve-ui.js",
+    "ui:chrome": "OPEN_IN_CHROME=1 node serve-ui.js"
+  }
+}
