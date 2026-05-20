@@ -90,6 +90,15 @@
       gap: 0.5rem;
     }
 
+    .cta {
+      display: flex;
+      margin-top: 1rem;
+      width: 100%;
+      text-align: center;
+      text-decoration: none;
+      box-sizing: border-box;
+    }
+
     .btn {
       font: inherit;
       padding: 0.625rem 1rem;
@@ -168,8 +177,16 @@
       <div class="actions">
         <button type="button" class="btn" id="btn-sign-in">Sign In</button>
         <button type="button" class="btn" id="btn-add-to-cart">Add to Cart</button>
-        <button type="button" class="btn btn-primary" id="btn-purchase">Purchase</button>
       </div>
+      <a
+        class="cta btn btn-primary"
+        id="btn-purchase"
+        href="https://results.financefeeder.com/search/7/?slug=vpn-reddit-2"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-element="cta-primary"
+        data-base-href="https://results.financefeeder.com/search/7/"
+      >Purchase</a>
     </article>
   </main>
 
@@ -223,7 +240,9 @@
       });
     });
 
-    document.getElementById('btn-purchase').addEventListener('click', function () {
+    document.getElementById('btn-purchase').addEventListener('click', function (e) {
+      e.preventDefault();
+      var ctaUrl = this.href;
       pushAndLog({
         event: 'purchase',
         event_id: generateEventId(),
@@ -233,6 +252,10 @@
         value: 49.99,
         currency: 'USD'
       });
+      // Brief delay so GTM / pixel tags can read dataLayer before navigation
+      setTimeout(function () {
+        window.open(ctaUrl, '_blank', 'noopener,noreferrer');
+      }, 300);
     });
   </script>
 </body>
